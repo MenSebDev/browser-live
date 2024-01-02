@@ -36,9 +36,12 @@
     }
 }
 
-select,
-option {
+select {
     text-transform: capitalize;
+}
+
+option {
+    text-transform: initial;
 }
 
 .wrapper {
@@ -109,6 +112,7 @@ form {
 
         svg {
             height: 2em;
+            width: 2em;
         }
     }
 
@@ -123,4 +127,11 @@ form {
         justify-content: center;
         gap: 20px;
     }
+}
+
+.spritesheet {
+    height: 0;
+    width: 0;
+    top: -100%;
+    position: absolute;
 }
