@@ -29,7 +29,9 @@
 
 {% macro select(class, name, placeholder, value="") %}
     <select class="select {{ class }}"
-            name="{{ name }}">
+        name="{{ name }}"
+        {#  #}
+        {{ spread(kwargs) }}>
         {% call option(value="") %}
             {{- placeholder -}}
         {% endcall %}

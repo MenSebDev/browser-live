@@ -31,7 +31,7 @@
     {% endcall %}
 
     {% call fieldset(class="fieldset-browser", legend="Setup Browser") %}
-        {% call select(class="select-browser", name="browser", placeholder="Select browser...") %}
+        {% call select(class="select-browser", name="browser", placeholder="Select browser...", required=true) %}
             {% for browser in context.browsers %}
                 {% call option(value=browser) %}
                     {{- browser -}}
@@ -73,11 +73,13 @@
                 name="width",
                 pattern="[0-9]",
                 placeholder="Width...",
+                required=true,
                 type="number") }}
         {{ input(class="input-height",
                 name="height",
                 pattern="[0-9]",
                 placeholder="Height...",
+                required=true,
                 type="number") }}
     {% endcall %}
 

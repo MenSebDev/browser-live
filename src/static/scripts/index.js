@@ -5,44 +5,36 @@ class BrowserStack {
         this.form.addEventListener('submit', this.start);
         this.form.addEventListener('reset', this.stop);
 
-        this.selectBrowser = this.form.elements['select-browser'];
-        this.selectDevice = this.form.elements['select-device'];
+        this.selectBrowser = this.form.elements['browser'];
+        this.selectDevice = this.form.elements['device'];
+        this.selectBreakpoint = this.form.elements['breakpoint'];
 
-        this.inputHeight = this.form.elements['input-height'];
-        this.inputWidth = this.form.elements['input-width'];
+        this.inputHeight = this.form.elements['height'];
+        this.inputWidth = this.form.elements['width'];
 
-        // this.inputHost = this.form.elements['input-host'];
-        // this.inputPort = this.form.elements['input-host'];
-
-        this.breakpointsNodeList = this.form.elements['breakpoint'];
+        console.log(
+            this.selectBreakpoint,
+            this.selectDevice,
+            this.inputHeight,
+            this.inputWidth,
+        );
     }
 
     dispatchChange = (event) => {
         const { target } = event;
 
         switch (target) {
-            case this.selectDevice:
-                return this.onSelectDevice(event);
             case this.selectBrowser:
                 return this.onSelectBrowser(event);
+            case this.selectBreakpoint:
+                this.selectDevice.value = '';
+                return this.onSelectBreakpoint(event);
+            case this.selectDevice:
+                this.selectBreakpoint.value = '';
+                return this.onSelectDevice(event);
             default:
-                if (target.getAttribute('name') === 'breakpoint')
-                    return this.onSelectBreakpoint(event);
-
                 console.log('UNHANDLE EVENT', event);
         }
-    };
-
-    enableSizeInput = (input) => {
-        input.removeAttribute('disabled');
-        input.setAttribute('aria-disabled', 'false');
-        input.setAttribute('required', true);
-    };
-
-    disableSizeInput = (input) => {
-        input.removeAttribute('required');
-        input.setAttribute('disabled', true);
-        input.setAttribute('aria-disabled', 'true');
     };
 
     updateInputHeight = (value) => {
@@ -52,6 +44,8 @@ class BrowserStack {
     updateInputWidth = (value) => {
         this.inputWidth.value = value;
     };
+
+    updateInputSize;
 
     onSelectBrowser = (event) => {
         console.log('SELECT BROWSER', event);
@@ -66,48 +60,17 @@ class BrowserStack {
 
         this.updateInputHeight(height);
         this.updateInputWidth(width);
-
-        if (selectedOption.value === 'custom') {
-            this.enableSizeInput(this.inputHeight);
-            this.enableSizeInput(this.inputWidth);
-        } else if (this.inputHeight.hasAttribute('required')) {
-            console.log('DISABLE');
-            this.disableSizeInput(this.inputHeight);
-            this.disableSizeInput(this.inputWidth);
-        }
-
-        if (selectedOption.value !== '') {
-            const { value: valueBreakpoint } = this.breakpointsNodeList;
-
-            if (valueBreakpoint !== '') {
-                const checkedBreakpoint = this.form.querySelector(
-                    `[name=breakpoint][value="${valueBreakpoint}"]`,
-                );
-
-                checkedBreakpoint.checked = false;
-            }
-        }
     };
 
     onSelectBreakpoint = (event) => {
         console.log('SELECT BREAKPOINT', event);
 
-        const { value: selectedDevice } = this.selectDevice;
+        const { selectedOptions } = this.selectBreakpoint;
+        const selectedOption = selectedOptions[0];
+        const { height, width } = selectedOption.dataset;
 
-        if (selectedDevice !== '') {
-            console.log('RESET DEIVCE');
-
-            this.selectDevice.value = '';
-
-            this.updateInputHeight('');
-            this.updateInputWidth('');
-
-            if (this.inputHeight.hasAttribute('required')) {
-                console.log('DISABLE');
-                this.disableSizeInput(this.inputHeight);
-                this.disableSizeInput(this.inputWidth);
-            }
-        }
+        this.updateInputHeight(height);
+        this.updateInputWidth(width);
     };
 
     start = async (event) => {
