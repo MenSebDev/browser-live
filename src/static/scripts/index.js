@@ -1,87 +1,42 @@
-class BrowserStack {
+class BrowserLive {
     constructor() {
-        this.form = document.querySelector('form');
-        this.form.addEventListener('change', this.dispatchChange);
-        this.form.addEventListener('submit', this.start);
-        this.form.addEventListener('reset', this.stop);
+        this.form = document.getElementById('form-setup');
+        this.form.addEventListener('reset', this.reset);
+        this.form.addEventListener('submit', this.submit);
+
+        this.selectBreakpoint = this.form.elements['breakpoint'];
+        this.selectBreakpoint.addEventListener('change', this.updateBreakpoint);
 
         this.selectBrowser = this.form.elements['browser'];
+        this.selectBrowser.addEventListener('change', this.updateBrowser);
+
         this.selectDevice = this.form.elements['device'];
-        this.selectBreakpoint = this.form.elements['breakpoint'];
+        this.selectDevice.addEventListener('change', this.updateDevice);
+
+        this.selectDisplay = this.form.elements['display'];
+        this.selectDisplay.addEventListener('change', this.updateDisplay);
 
         this.inputHeight = this.form.elements['height'];
-        this.inputWidth = this.form.elements['width'];
+        this.inputHeight.addEventListener('input', this.updateDimension);
 
-        console.log(
-            this.selectBreakpoint,
-            this.selectDevice,
-            this.inputHeight,
-            this.inputWidth,
-        );
+        this.inputWidth = this.form.elements['width'];
+        this.inputWidth.addEventListener('input', this.updateDimension);
     }
 
-    dispatchChange = (event) => {
-        const { target } = event;
+    reset = async (event) => {
+        event.preventDefault();
 
-        switch (target) {
-            case this.selectBrowser:
-                return this.onSelectBrowser(event);
-            case this.selectBreakpoint:
-                this.selectDevice.value = '';
-                return this.onSelectBreakpoint(event);
-            case this.selectDevice:
-                this.selectBreakpoint.value = '';
-                return this.onSelectDevice(event);
-            default:
-                console.log('UNHANDLE EVENT', event);
-        }
+        const response = await fetch('/api/browser/stop');
+
+        const json = await response.json();
+
+        console.log(json);
     };
 
-    updateInputHeight = (value) => {
-        this.inputHeight.value = value;
-    };
-
-    updateInputWidth = (value) => {
-        this.inputWidth.value = value;
-    };
-
-    updateInputSize;
-
-    onSelectBrowser = (event) => {
-        console.log('SELECT BROWSER', event);
-    };
-
-    onSelectDevice = (event) => {
-        console.log('SELECT DEVICE', event);
-
-        const { selectedOptions } = this.selectDevice;
-        const selectedOption = selectedOptions[0];
-        const { height, width } = selectedOption.dataset;
-
-        this.updateInputHeight(height);
-        this.updateInputWidth(width);
-    };
-
-    onSelectBreakpoint = (event) => {
-        console.log('SELECT BREAKPOINT', event);
-
-        const { selectedOptions } = this.selectBreakpoint;
-        const selectedOption = selectedOptions[0];
-        const { height, width } = selectedOption.dataset;
-
-        this.updateInputHeight(height);
-        this.updateInputWidth(width);
-    };
-
-    start = async (event) => {
+    submit = async (event) => {
         event.preventDefault();
 
         const formData = new FormData(this.form);
-
-        if (this.selectDevice.value !== 'custom') {
-            formData.append(this.inputHeight.name, this.inputHeight.value);
-            formData.append(this.inputWidth.name, this.inputWidth.value);
-        }
 
         const response = await fetch('/api/browser/start', {
             body: formData,
@@ -93,15 +48,51 @@ class BrowserStack {
         console.log(json);
     };
 
-    stop = async (event) => {
-        event.preventDefault();
+    updateBreakpoint = (event) => {
+        console.log('SELECT BREAKPOINT', { event });
 
-        const response = await fetch('/api/browser/stop');
+        this.selectDevice.value = '';
+        this.updateInputDimension(event.target);
+    };
 
-        const json = await response.json();
+    updateBrowser = (event) => {
+        console.log('SELECT BROWSER', { event });
+    };
 
-        console.log(json);
+    updateDevice = (event) => {
+        console.log('SELECT DEVICE', { event });
+
+        this.selectBreakpoint.value = '';
+        this.updateInputDimension(event.target);
+    };
+
+    updateDimension = (event) => {
+        console.log('INPUT DIMENSION', { event });
+
+        this.selectDevice.value = '';
+        this.selectBreakpoint.value = '';
+    };
+
+    updateDisplay = (event) => {
+        console.log('SELECT DISPLAY', { event });
+    };
+
+    updateInputDimension = (selectElement) => {
+        const { selectedOptions } = selectElement;
+        const selectedOption = selectedOptions[0];
+        const { height, width } = selectedOption.dataset;
+
+        this.updateInputHeight(height);
+        this.updateInputWidth(width);
+    };
+
+    updateInputHeight = (value) => {
+        this.inputHeight.value = value;
+    };
+
+    updateInputWidth = (value) => {
+        this.inputWidth.value = value;
     };
 }
 
-new BrowserStack();
+new BrowserLive();
