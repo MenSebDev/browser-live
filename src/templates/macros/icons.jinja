@@ -1,0 +1,26 @@
+{% macro symbol(name, path, viewbox=VIEWBOX) %}
+    <symbol id="icon-{{ name }}"
+            viewBox="{{ viewbox }}">
+        <path d="{{ path }}" />
+    </symbol>
+{% endmacro %}
+
+{% macro icon(class, name) %}
+    <svg aria-hidden="true"
+         class="icon {{ class }}"
+         data-icon="{{ name }}">
+        <use href="#icon-{{ name }}" />
+    </svg>
+{% endmacro %}
+
+{% macro sprites(icons=ICONS) %}
+    {% for name, path in icons.items() %}
+        {{ symbol(name=name, path=path) }}
+    {% endfor %}
+{% endmacro %}
+
+{% set VIEWBOX = "0 0 24 24" %}
+{% set ICONS = {
+    "check": "M18.71,7.21a1,1,0,0,0-1.42,0L9.84,14.67,6.71,11.53A1,1,0,1,0,5.29,13l3.84,3.84a1,1,0,0,0,1.42,0l8.16-8.16A1,1,0,0,0,18.71,7.21Z",
+    "cross": "M19,11H13V5a1,1,0,0,0-2,0v6H5a1,1,0,0,0,0,2h6v6a1,1,0,0,0,2,0V13h6a1,1,0,0,0,0-2Z"
+} %}
