@@ -6,8 +6,6 @@ from typing import TYPE_CHECKING
 
 from utilities import PATH_DRIVERS, Drivers
 
-from tools import logger
-
 if TYPE_CHECKING:
     from pathlib import Path
 
@@ -31,7 +29,5 @@ class Controller:
 
         return self.browsers.get(browser)
 
-
-logger.info_(msg=f"PATH {PATH_DRIVERS}")
 
 controller = Controller(path_drivers=PATH_DRIVERS)

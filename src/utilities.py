@@ -31,7 +31,8 @@ class Breakpoint(NamedTuple):
     """Interface representing a breakpoint."""
 
     name: str
-    value: float
+    width: float
+    height: float
 
 
 class Device(NamedTuple):
