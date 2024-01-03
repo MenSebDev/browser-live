@@ -1,5 +1,9 @@
 class BrowserLive {
     constructor() {
+        this.params = undefined;
+        this.active = false;
+        this.loading = false;
+
         this.form = document.getElementById('form-setup');
         this.form.addEventListener('reset', this.reset);
         this.form.addEventListener('submit', this.submit);
@@ -21,22 +25,58 @@ class BrowserLive {
 
         this.inputWidth = this.form.elements['width'];
         this.inputWidth.addEventListener('input', this.updateDimension);
+
+        this.loadingSpinner = this.form.querySelector('.loading');
     }
+
+    startLoading = () => {
+        this.loading = true;
+        this.loadingSpinner.classList.add('active');
+        setTimeout(() => this.loadingSpinner.classList.add('visible'), 0);
+    };
+
+    stopLoading = () => {
+        this.loading = false;
+
+        setTimeout(() => {
+            this.loadingSpinner.classList.add('done');
+            this.loadingSpinner.classList.remove('visible');
+
+            setTimeout(() => {
+                this.loadingSpinner.classList.remove('done');
+                this.loadingSpinner.classList.remove('active');
+            }, 1000);
+        }, 1000);
+    };
 
     reset = async (event) => {
         event.preventDefault();
+
+        if (!this.active) return;
+
+        this.startLoading();
 
         const response = await fetch('/api/browser/stop');
 
         const json = await response.json();
 
         console.log(json);
+
+        this.stopLoading();
+
+        this.active = false;
     };
 
     submit = async (event) => {
         event.preventDefault();
 
         const formData = new FormData(this.form);
+
+        const params = new URLSearchParams(formData).toString();
+
+        if (this.active && params === this.params) return;
+
+        this.startLoading();
 
         const response = await fetch('/api/browser/start', {
             body: formData,
@@ -46,6 +86,11 @@ class BrowserLive {
         const json = await response.json();
 
         console.log(json);
+
+        this.stopLoading();
+
+        this.params = params;
+        this.active = true;
     };
 
     updateBreakpoint = (event) => {
@@ -80,7 +125,7 @@ class BrowserLive {
     updateInputDimension = (selectElement) => {
         const { selectedOptions } = selectElement;
         const selectedOption = selectedOptions[0];
-        const { height, width } = selectedOption.dataset;
+        const { height = '', width = '' } = selectedOption.dataset;
 
         this.updateInputHeight(height);
         this.updateInputWidth(width);
