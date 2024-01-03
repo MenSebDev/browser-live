@@ -1,0 +1,26 @@
+name,width,height,category
+Apple iPhone X,375,812,mobile
+Apple iPhone 6,414,736,mobile
+Apple iPod Touch,320,568,mobile
+Apple iPad Pro,1024,1366,tablet
+Apple iPad mini,768,1024,tablet
+LG Nexus 4,384,640,mobile
+Samsung Galaxy S8,360,740,mobile
+Samsung Galaxy Nexus,360,600,mobile
+Samsung Galaxy Note,400,640,mobile
+Samsung Galaxy Tab,800,1280,tablet
+Samsung Galaxy Tab 2,600,1024,tablet
+Microsoft Lumia 1520,432,768,mobile
+Microsoft Lumia 1020,320,480,mobile
+Microsoft Surface Pro 3,1024,1440,tablet
+Microsoft Surface Pro 2,720,1280,tablet
+Microsoft Surface,768,1366,tablet
+Xiaomi Redmi Note 5,393,786,mobile
+Blackberry Leap,390,695,mobile
+Blackberry Passport,504,504,mobile
+Blackberry Classic,390,390,mobile
+Blackberry Q10,346,346,mobile
+Asus Nexus 7,600,960,tablet
+Amazon Kindle Fire,480,800,tablet
+Google Pixel,411,731,mobile
+Motorola Nexus 6,412,690,mobile

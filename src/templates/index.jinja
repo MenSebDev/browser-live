@@ -19,12 +19,14 @@
                 src="{{ url_for('static', filename='scripts/index.js') }}"></script>
     </head>
     <body>
+        {% include "components/spritesheet.jinja" %}
         <header>
             <div class="wrapper">
             </div>
         </header>
         <main>
             <div class="wrapper">
+                {% include "components/form.jinja" %}
             </div>
         </main>
         <footer>

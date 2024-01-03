@@ -36,9 +36,12 @@
     }
 }
 
-select,
-option {
+select {
     text-transform: capitalize;
+}
+
+option {
+    text-transform: initial;
 }
 
 .wrapper {
@@ -65,7 +68,7 @@ form {
     display: flex;
     flex-direction: column;
     gap: 20px;
-
+    position: relative;
     max-width: 1000px;
 
     fieldset {
@@ -109,6 +112,7 @@ form {
 
         svg {
             height: 2em;
+            width: 2em;
         }
     }
 
@@ -122,5 +126,52 @@ form {
         display: flex;
         justify-content: center;
         gap: 20px;
+    }
+}
+
+.spritesheet {
+    height: 0;
+    width: 0;
+    top: -100%;
+    position: absolute;
+}
+
+.loading {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(#000, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+
+    &:not(.active) {
+        display: none;
+    }
+
+    &.done {
+        animation-play-state: paused;
+    }
+
+    &.visible {
+        opacity: 1;
+    }
+
+    &-spinner {
+        height: 200px;
+        width: 200px;
+        border-radius: 50%;
+        border: 5px solid darkgray;
+        border-right-color: orangered;
+        animation: spin 1s linear infinite;
+        animation-play-state: inherit;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(1turn);
+        }
     }
 }

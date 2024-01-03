@@ -1,0 +1,51 @@
+{% from "macros/utilities.jinja" import spread %}
+
+{% macro fieldset(class, legend) %}
+    <fieldset class="fieldset {{ class }}">
+        <legend class="legend">
+            {{- legend -}}
+        </legend>
+        {{ caller() }}
+    </fieldset>
+{% endmacro %}
+
+{% macro label(class, label) %}
+    <label class="label {{ class }}">
+        <span class="label-text">
+            {{- label -}}
+        </span>
+        {{ caller() }}
+    </label>
+{% endmacro %}
+
+{% macro option(class, value) %}
+    <option class="option {{ class }}"
+        value="{{ value }}"
+        {#  #}
+        {{ spread(kwargs) }}>
+        {{- caller() -}}
+    </option>
+{% endmacro %}
+
+{% macro select(class, name, placeholder, value="") %}
+    <select class="select {{ class }}"
+        name="{{ name }}"
+        {#  #}
+        {{ spread(kwargs) }}>
+        {% call option(value="") %}
+            {{- placeholder -}}
+        {% endcall %}
+        {{ caller() }}
+    </select>
+{% endmacro %}
+
+{% macro input(class, name, placeholder, type = "text", value = "") %}
+    <input class="input {{ class }}"
+        name="{{ name }}"
+        placeholder="{{ placeholder }}"
+        type="{{ type }}"
+        value="{{ value }}"
+        {#  #}
+        {{ spread(kwargs) }}>
+    </input>
+{% endmacro %}

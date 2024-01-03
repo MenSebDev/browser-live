@@ -1,0 +1,100 @@
+{% from "macros/forms.jinja" import fieldset, input, label, option, select %}
+{% from "macros/icons.jinja" import icon %}
+
+<form class="form"
+      id="form-setup">
+    {% call fieldset(class="fieldset-url", legend="Setup URL") %}
+        {% call label(class="label-url", label="URL") %}
+            {{ input(class="input-url",
+                        name="url",
+                        placeholder="URL...",
+                        type="url") }}
+        {% endcall %}
+
+        {% call label(class="label-host", label="HOST") %}
+            {{ input(class="input-host",
+                        maxlength="255",
+                        name="host",
+                        pattern="(\d+\.){3}\d+",
+                        placeholder="HOST...",
+                        value="127.0.0.1") }}
+        {% endcall %}
+
+        {% call label(class="label-port", label="PORT") %}
+            {{ input(class="input-port",
+                        name="port",
+                        pattern="[0-9]",
+                        placeholder="PORT...",
+                        type="number",
+                        value="8080") }}
+        {% endcall %}
+    {% endcall %}
+
+    {% call fieldset(class="fieldset-browser", legend="Setup Browser") %}
+        {% call select(class="select-browser", name="browser", placeholder="Select browser...", required=true) %}
+            {% for browser in context.browsers %}
+                {% call option(value=browser) %}
+                    {{- browser -}}
+                {% endcall %}
+            {% endfor %}
+        {% endcall %}
+    {% endcall %}
+
+    {% call fieldset(class="fieldset-display", legend="Setup Display") %}
+        {% call select(class="select-display", name="display", placeholder="Select display...") %}
+            {% for display in context.displays %}
+                {% call option(value=display) %}
+                    {{- display -}}
+                {% endcall %}
+            {% endfor %}
+        {% endcall %}
+    {% endcall %}
+
+    {% call fieldset(class="fieldset-window", legend="Setup Window") %}
+        {% call select(class="select-breakpoint", name="breakpoint", placeholder="Select breakpoint...") %}
+            {% for breakpoint in context.breakpoints %}
+                {% call option(value=breakpoint.name, data_height=breakpoint.height, data_width=breakpoint.width) %}
+                    {{- breakpoint.name }} | {{ breakpoint.width }} x {{ breakpoint.height -}}
+                {% endcall %}
+            {% endfor %}
+        {% endcall %}
+
+        {% call select(class="select-device", name="device", placeholder="Select device...") %}
+            {% for device in context.devices %}
+                {% call option(value=device.name, data_height=device.height, data_width=device.width) %}
+                    {{- device.name }} | {{ device.width }} x {{ device.height -}}
+                {% endcall %}
+            {% endfor %}
+        {% endcall %}
+    {% endcall %}
+
+    {% call fieldset(class="fieldset-dimension", legend="Setup Dimension") %}
+        {% call label(class="label-width", label="WIDTH") %}
+            {{ input(class="input-width",
+                        name="width",
+                        pattern="[0-9]",
+                        placeholder="Width...",
+                        type="number") }}
+        {% endcall %}
+        {% call label(class="label-height", label="HEIGHT") %}
+            {{ input(class="input-height",
+                        name="height",
+                        pattern="[0-9]",
+                        placeholder="Height...",
+                        type="number") }}
+        {% endcall %}
+    {% endcall %}
+
+    <div class="buttons">
+        <button type="submit">
+            {{ icon(name="check") }}
+            <span>Submit</span>
+        </button>
+        <button type="reset">
+            {{ icon(name="cross") }}
+            <span>Reset</span>
+        </button>
+    </div>
+
+    {% include "components/loading.jinja" %}
+</form>

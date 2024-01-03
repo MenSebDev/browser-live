@@ -1,124 +1,82 @@
-class BrowserStack {
+class BrowserLive {
     constructor() {
-        this.form = document.querySelector('form');
-        this.form.addEventListener('change', this.dispatchChange);
-        this.form.addEventListener('submit', this.start);
-        this.form.addEventListener('reset', this.stop);
+        this.params = undefined;
+        this.active = false;
+        this.loading = false;
 
-        this.selectBrowser = this.form.elements['select-browser'];
-        this.selectDevice = this.form.elements['select-device'];
+        this.form = document.getElementById('form-setup');
+        this.form.addEventListener('reset', this.reset);
+        this.form.addEventListener('submit', this.submit);
 
-        this.inputHeight = this.form.elements['input-height'];
-        this.inputWidth = this.form.elements['input-width'];
+        this.selectBreakpoint = this.form.elements['breakpoint'];
+        this.selectBreakpoint.addEventListener('change', this.updateBreakpoint);
 
-        // this.inputHost = this.form.elements['input-host'];
-        // this.inputPort = this.form.elements['input-host'];
+        this.selectBrowser = this.form.elements['browser'];
+        this.selectBrowser.addEventListener('change', this.updateBrowser);
 
-        this.breakpointsNodeList = this.form.elements['breakpoint'];
+        this.selectDevice = this.form.elements['device'];
+        this.selectDevice.addEventListener('change', this.updateDevice);
+
+        this.selectDisplay = this.form.elements['display'];
+        this.selectDisplay.addEventListener('change', this.updateDisplay);
+
+        this.inputHeight = this.form.elements['height'];
+        this.inputHeight.addEventListener('input', this.updateDimension);
+
+        this.inputWidth = this.form.elements['width'];
+        this.inputWidth.addEventListener('input', this.updateDimension);
+
+        this.loadingSpinner = this.form.querySelector('.loading');
     }
 
-    dispatchChange = (event) => {
-        const { target } = event;
-
-        switch (target) {
-            case this.selectDevice:
-                return this.onSelectDevice(event);
-            case this.selectBrowser:
-                return this.onSelectBrowser(event);
-            default:
-                if (target.getAttribute('name') === 'breakpoint')
-                    return this.onSelectBreakpoint(event);
-
-                console.log('UNHANDLE EVENT', event);
-        }
+    startLoading = () => {
+        this.loading = true;
+        this.loadingSpinner.classList.add('active');
+        setTimeout(() => this.loadingSpinner.classList.add('visible'), 0);
     };
 
-    enableSizeInput = (input) => {
-        input.removeAttribute('disabled');
-        input.setAttribute('aria-disabled', 'false');
-        input.setAttribute('required', true);
+    stopLoading = () => {
+        this.loading = false;
+
+        setTimeout(() => {
+            this.loadingSpinner.classList.add('done');
+            this.loadingSpinner.classList.remove('visible');
+
+            setTimeout(() => {
+                this.loadingSpinner.classList.remove('done');
+                this.loadingSpinner.classList.remove('active');
+            }, 1000);
+        }, 1000);
     };
 
-    disableSizeInput = (input) => {
-        input.removeAttribute('required');
-        input.setAttribute('disabled', true);
-        input.setAttribute('aria-disabled', 'true');
+    reset = async (event) => {
+        event.preventDefault();
+
+        if (!this.active) return;
+
+        this.startLoading();
+
+        const response = await fetch('/api/browser/stop');
+
+        const json = await response.json();
+
+        console.log(json);
+
+        this.stopLoading();
+
+        this.active = false;
     };
 
-    updateInputHeight = (value) => {
-        this.inputHeight.value = value;
-    };
-
-    updateInputWidth = (value) => {
-        this.inputWidth.value = value;
-    };
-
-    onSelectBrowser = (event) => {
-        console.log('SELECT BROWSER', event);
-    };
-
-    onSelectDevice = (event) => {
-        console.log('SELECT DEVICE', event);
-
-        const { selectedOptions } = this.selectDevice;
-        const selectedOption = selectedOptions[0];
-        const { height, width } = selectedOption.dataset;
-
-        this.updateInputHeight(height);
-        this.updateInputWidth(width);
-
-        if (selectedOption.value === 'custom') {
-            this.enableSizeInput(this.inputHeight);
-            this.enableSizeInput(this.inputWidth);
-        } else if (this.inputHeight.hasAttribute('required')) {
-            console.log('DISABLE');
-            this.disableSizeInput(this.inputHeight);
-            this.disableSizeInput(this.inputWidth);
-        }
-
-        if (selectedOption.value !== '') {
-            const { value: valueBreakpoint } = this.breakpointsNodeList;
-
-            if (valueBreakpoint !== '') {
-                const checkedBreakpoint = this.form.querySelector(
-                    `[name=breakpoint][value="${valueBreakpoint}"]`,
-                );
-
-                checkedBreakpoint.checked = false;
-            }
-        }
-    };
-
-    onSelectBreakpoint = (event) => {
-        console.log('SELECT BREAKPOINT', event);
-
-        const { value: selectedDevice } = this.selectDevice;
-
-        if (selectedDevice !== '') {
-            console.log('RESET DEIVCE');
-
-            this.selectDevice.value = '';
-
-            this.updateInputHeight('');
-            this.updateInputWidth('');
-
-            if (this.inputHeight.hasAttribute('required')) {
-                console.log('DISABLE');
-                this.disableSizeInput(this.inputHeight);
-                this.disableSizeInput(this.inputWidth);
-            }
-        }
-    };
-
-    start = async (event) => {
+    submit = async (event) => {
         event.preventDefault();
 
         const formData = new FormData(this.form);
 
-        if (this.selectDevice.value !== 'custom') {
-            formData.append(this.inputHeight.name, this.inputHeight.value);
-            formData.append(this.inputWidth.name, this.inputWidth.value);
-        }
+        const params = new URLSearchParams(formData).toString();
+
+        if (this.active && params === this.params) return;
+
+        this.startLoading();
 
         const response = await fetch('/api/browser/start', {
             body: formData,
@@ -128,17 +86,58 @@ class BrowserStack {
         const json = await response.json();
 
         console.log(json);
+
+        this.stopLoading();
+
+        this.params = params;
+        this.active = true;
     };
 
-    stop = async (event) => {
-        event.preventDefault();
+    updateBreakpoint = (event) => {
+        console.log('SELECT BREAKPOINT', { event });
 
-        const response = await fetch('/api/browser/stop');
+        this.selectDevice.value = '';
+        this.updateInputDimension(event.target);
+    };
 
-        const json = await response.json();
+    updateBrowser = (event) => {
+        console.log('SELECT BROWSER', { event });
+    };
 
-        console.log(json);
+    updateDevice = (event) => {
+        console.log('SELECT DEVICE', { event });
+
+        this.selectBreakpoint.value = '';
+        this.updateInputDimension(event.target);
+    };
+
+    updateDimension = (event) => {
+        console.log('INPUT DIMENSION', { event });
+
+        this.selectDevice.value = '';
+        this.selectBreakpoint.value = '';
+    };
+
+    updateDisplay = (event) => {
+        console.log('SELECT DISPLAY', { event });
+    };
+
+    updateInputDimension = (selectElement) => {
+        const { selectedOptions } = selectElement;
+        const selectedOption = selectedOptions[0];
+        const { height = '', width = '' } = selectedOption.dataset;
+
+        this.updateInputHeight(height);
+        this.updateInputWidth(width);
+    };
+
+    updateInputHeight = (value) => {
+        this.inputHeight.value = value;
+    };
+
+    updateInputWidth = (value) => {
+        this.inputWidth.value = value;
     };
 }
 
-new BrowserStack();
+new BrowserLive();
