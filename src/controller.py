@@ -71,6 +71,8 @@ class Controller:
 
         self.options = Options(**options)
 
+    # INVESTIGATE ERROR ON RACE CONDITION BETWEEN DRIVER INITIATION
+    # AND TRYING TO ACCESS E.G. THE WINDOW HANDLE OR THE DRIVER NAME
     def start(self: Controller) -> None:
         logger.trace_()
 
