@@ -69,18 +69,20 @@
     {% endcall %}
 
     {% call fieldset(class="fieldset-dimension", legend="Setup Dimension") %}
-        {{ input(class="input-width",
-                name="width",
-                pattern="[0-9]",
-                placeholder="Width...",
-                required=true,
-                type="number") }}
-        {{ input(class="input-height",
-                name="height",
-                pattern="[0-9]",
-                placeholder="Height...",
-                required=true,
-                type="number") }}
+        {% call label(class="label-width", label="WIDTH") %}
+            {{ input(class="input-width",
+                        name="width",
+                        pattern="[0-9]",
+                        placeholder="Width...",
+                        type="number") }}
+        {% endcall %}
+        {% call label(class="label-height", label="HEIGHT") %}
+            {{ input(class="input-height",
+                        name="height",
+                        pattern="[0-9]",
+                        placeholder="Height...",
+                        type="number") }}
+        {% endcall %}
     {% endcall %}
 
     <div class="buttons">
@@ -93,4 +95,6 @@
             <span>Reset</span>
         </button>
     </div>
+
+    {% include "components/loading.jinja" %}
 </form>
