@@ -21,6 +21,8 @@ from selenium.webdriver import (
     SafariService,
 )
 
+from tools import logger
+
 if TYPE_CHECKING:
     from argparse import Namespace
 
@@ -53,9 +55,50 @@ class Drivers:
     ) -> None:
         self.path_drivers = Path(path_drivers)
 
+    def launch(
+        self: Drivers,
+        browser: str,
+    ) -> WebDriver:
+        """Launch the browser web driver.
+
+        Parameters
+        ----------
+        browser : str
+            The browser to launch.
+
+        Returns
+        -------
+        WebDriver
+            The browser web driver.
+        """
+        callback = None
+
+        match browser:
+            case "chrome":
+                callback = self.chrome
+            case "edge":
+                callback = self.edge
+            case "explorer":
+                callback = self.explorer
+            case "firefox":
+                callback = self.firefox
+            case "opera":
+                callback = self.opera
+            case "safari":
+                callback = self.safari
+            case _:
+                logger.warn_(msg=f"Unknown Browser {browser}.")
+                logger.info_(msg="Launching driver for Chrome instead.")
+                callback = self.chrome
+
+        return callback()
+
     def chrome(self: Drivers) -> WebDriver:
         options = ChromeOptions()
-        service = ChromeService(executable_path=self.path_drivers / "chrome.exe")
+        service = ChromeService()
+        # Use without executable path to driver or it crash
+        # path = self.path_drivers / "chrome.exe"  # noqa: ERA001
+        # service = ChromeService(executable_path=path)  # noqa: ERA001
         return webdriver.Chrome(options=options, service=service)
 
     def edge(self: Drivers) -> WebDriver:
@@ -82,6 +125,20 @@ class Drivers:
         options = SafariOptions()
         service = SafariService()
         return webdriver.Safari(options=options, service=service)
+
+
+class Options(NamedTuple):
+    """Interface representing the options."""
+
+    url: str
+    host: str
+    port: str
+    browser: str
+    display: str
+    breakpoint: str  # noqa: A003
+    device: str
+    width: str
+    height: str
 
 
 def read_args_cli() -> Namespace:

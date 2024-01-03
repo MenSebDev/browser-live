@@ -12,8 +12,6 @@ from utilities import (
     SYSTEMS,
 )
 
-from tools import logger
-
 
 @app.route("/")
 def route_index() -> str:
@@ -32,11 +30,8 @@ def route_index() -> str:
 @app.route("/api/browser/start", methods=["POST"])
 def start_browser() -> str:
     """Start the web browser."""
-    options = request.form.to_dict()
-
-    logger.info_(msg=f"OPTIONS {options}")
-
-    controller.start(**options)
+    controller.setup(**request.form.to_dict())
+    controller.start()
 
     return jsonify("api_driver_start!")
 
@@ -45,7 +40,5 @@ def start_browser() -> str:
 def stop_browser() -> str:
     """Stop the web browser."""
     controller.stop()
-
-    logger.info_(msg=f"DRIVER {controller.driver}")
 
     return jsonify("api_driver_stop!")
